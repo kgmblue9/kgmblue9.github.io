@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>새 탭 - Google 스타일 시작페이지</title>
+  <meta name="description" content="실시간 날씨(서울/제주), 구글 검색, 오늘의 명언이 함께하는 스마트하고 깔끔한 구글 스타일 시작페이지">
+  
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔍</text></svg>">
+  
+  <!-- Google Fonts: Inter & Noto Sans KR -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="light-theme">
+  <!-- Background Ambient Glow (Subtle Material Glow) -->
+  <div class="ambient-glow" aria-hidden="true"></div>
+
+  <!-- Header Section -->
+  <header class="header">
+    <div class="header-left">
+      <!-- Seoul Digital University Logo Link -->
+      <a href="https://www.sdu.ac.kr" target="_blank" rel="noopener" class="sdu-logo-link" title="서울디지털대학교 홈페이지 바로가기" aria-label="서울디지털대학교 홈페이지">
+        <div class="sdu-logo-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 3L1 9L12 15L21 10.09V17H23V9L12 3Z" fill="#1A73E8"/>
+            <path d="M5 13.18V17.18C5 19.84 8.13 22 12 22C15.87 22 19 19.84 19 17.18V13.18L12 17L5 13.18Z" fill="#0D47A1"/>
+          </svg>
+        </div>
+        <div class="sdu-text-group">
+          <span class="sdu-title">서울디지털대학교</span>
+          <span class="sdu-subtitle">SDU</span>
+        </div>
+      </a>
+
+      <!-- Weather Pill / Card Toggle Bar -->
+      <div class="weather-compact-container" id="weatherWidget" role="region" aria-label="오늘의 날씨 정보">
+        <div class="weather-tabs" role="tablist">
+          <button class="weather-tab-btn active" id="tabSeoul" role="tab" aria-selected="true" data-city="seoul">
+            <span class="city-name">서울</span>
+            <span class="city-temp" id="seoulMiniTemp">--°</span>
+            <span class="city-icon" id="seoulMiniIcon">☀️</span>
+          </button>
+          <button class="weather-tab-btn" id="tabJeju" role="tab" aria-selected="false" data-city="jeju">
+            <span class="city-name">제주</span>
+            <span class="city-temp" id="jejuMiniTemp">--°</span>
+            <span class="city-icon" id="jejuMiniIcon">⛅</span>
+          </button>
+        </div>
+
+        <!-- Expanded Weather Popover -->
+        <div class="weather-dropdown" id="weatherDropdown" aria-hidden="true">
+          <div class="weather-card-content">
+            <div class="weather-card-header">
+              <div class="location-badge">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                </svg>
+                <span id="currentCityLabel">서울특별시</span>
+              </div>
+              <button class="btn-icon-subtle" id="refreshWeatherBtn" title="날씨 새로고침" aria-label="날씨 새로고침">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+                </svg>
+              </button>
+            </div>
+
+            <div class="weather-main-info">
+              <div class="weather-icon-large" id="currentWeatherIcon">☀️</div>
+              <div class="weather-temp-group">
+                <div class="current-temp" id="currentTemp">--<span class="unit">°C</span></div>
+                <div class="weather-desc" id="currentWeatherDesc">날씨 정보 불러오는 중...</div>
+              </div>
+            </div>
+
+            <div class="weather-details-grid">
+              <div class="detail-item">
+                <span class="detail-label">최고 / 최저</span>
+                <span class="detail-value" id="currentHighLow">--° / --°</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">체감 온도</span>
+                <span class="detail-value" id="currentFeelsLike">--°C</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">습도</span>
+                <span class="detail-value" id="currentHumidity">--%</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">풍속</span>
+                <span class="detail-value" id="currentWind">-- m/s</span>
+              </div>
+            </div>
+
+            <!-- Mini Forecast / Comparison -->
+            <div class="weather-both-cities">
+              <div class="city-compare-box" id="compareSeoul">
+                <span class="compare-name">서울</span>
+                <span class="compare-stat" id="compareSeoulStat">--° / --</span>
+              </div>
+              <div class="city-compare-box" id="compareJeju">
+                <span class="compare-name">제주</span>
+                <span class="compare-stat" id="compareJejuStat">--° / --</span>
+              </div>
+            </div>
+
+            <div class="weather-footer">
+              <span class="update-time" id="weatherUpdateTime">방금 업데이트</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <!-- Real-time Clock Badge -->
+      <div class="clock-badge" id="liveClock" title="오늘 날짜 및 시간">
+        <span class="date-text" id="liveDate">0월 0일 (월)</span>
+        <span class="time-text" id="liveTime">00:00:00</span>
+      </div>
+
+      <!-- Theme Switcher -->
+      <button class="theme-toggle-btn" id="themeToggle" title="테마 변경 (라이트/다크)" aria-label="테마 전환">
+        <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </button>
+
+      <!-- Google Apps Launcher Button -->
+      <button class="apps-launcher-btn" id="appsLauncherBtn" title="Google 앱 바로가기" aria-label="Google 앱">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM6 4c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 12c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+        </svg>
+      </button>
+
+      <!-- Apps Dropdown Menu -->
+      <div class="apps-menu" id="appsMenu" aria-hidden="true">
+        <div class="apps-grid">
+          <a href="https://mail.google.com" target="_blank" rel="noopener" class="app-item">
+            <div class="app-icon-wrapper gmail">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M20 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6C22 4.9 21.1 4 20 4Z" fill="#EA4335" fill-opacity="0.15"/>
+                <path d="M22 6L12 13L2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6Z" fill="#4285F4"/>
+                <path d="M2 6L12 13L22 6H2Z" fill="#EA4335"/>
+              </svg>
+            </div>
+            <span>Gmail</span>
+          </a>
+          <a href="https://www.youtube.com" target="_blank" rel="noopener" class="app-item">
+            <div class="app-icon-wrapper youtube">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="#FF0000">
+                <path d="M21.58 7.19a2.5 2.5 0 0 0-1.76-1.77C18.26 5 12 5 12 5s-6.26 0-7.82.42A2.5 2.5 0 0 0 2.42 7.19C2 8.75 2 12 2 12s0 3.25.42 4.81a2.5 2.5 0 0 0 1.76 1.77C5.74 19 12 19 12 19s6.26 0 7.82-.42a2.5 2.5 0 0 0 1.76-1.77C22 15.25 22 12 22 12s0-3.25-.42-4.81zM9.75 15.02V8.98L15 12l-5.25 3.02z"/>
+              </svg>
+            </div>
+            <span>YouTube</span>
+          </a>
+          <a href="https://maps.google.com" target="_blank" rel="noopener" class="app-item">
+            <div class="app-icon-wrapper maps">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="#34A853">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+              </svg>
+            </div>
+            <span>지도</span>
+          </a>
+          <a href="https://drive.google.com" target="_blank" rel="noopener" class="app-item">
+            <div class="app-icon-wrapper drive">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="#FBBC05">
+                <path d="M8.27 3L3 12.15l4.63 8.01 5.27-9.15L8.27 3zm7.46 0L10.46 12h10.54l-5.27-9zm-2.46 9.85l-5.27 9.15h10.54l5.27-9.15H13.27z"/>
+              </svg>
+            </div>
+            <span>드라이브</span>
+          </a>
+          <a href="https://calendar.google.com" target="_blank" rel="noopener" class="app-item">
+            <div class="app-icon-wrapper calendar">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="#4285F4">
+                <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/>
+              </svg>
+            </div>
+            <span>캘린더</span>
+          </a>
+          <a href="https://translate.google.com" target="_blank" rel="noopener" class="app-item">
+            <div class="app-icon-wrapper translate">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="#4285F4">
+                <path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/>
+              </svg>
+            </div>
+            <span>번역</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-container">
+    <!-- Google Logo Section -->
+    <div class="logo-section">
+      <div class="google-logo" title="Google Start">
+        <span class="g-blue">G</span>
+        <span class="g-red">o</span>
+        <span class="g-yellow">o</span>
+        <span class="g-blue">g</span>
+        <span class="g-green">l</span>
+        <span class="g-red">e</span>
+      </div>
+    </div>
+
+    <!-- Search Section -->
+    <section class="search-section" aria-label="구글 검색 영역">
+      <form class="search-form" id="searchForm" action="https://www.google.com/search" method="GET" target="_blank" rel="noopener">
+        <div class="search-bar" id="searchBar">
+          <!-- Magnifying Glass Icon -->
+          <span class="search-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </span>
+
+          <!-- Search Input -->
+          <input 
+            type="text" 
+            name="q" 
+            id="searchInput" 
+            class="search-input" 
+            placeholder="Google 검색 또는 URL 입력 (단축키: /)" 
+            autocomplete="off" 
+            spellcheck="false" 
+            autofocus
+            aria-label="Google 검색창"
+          >
+
+          <!-- Action Buttons inside input -->
+          <div class="search-actions">
+            <!-- Clear Button -->
+            <button type="button" class="btn-input-action" id="clearSearchBtn" title="입력 지우기" aria-label="입력 지우기" style="display: none;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/>
+              </svg>
+            </button>
+
+            <!-- Voice Search Button -->
+            <button type="button" class="btn-input-action" id="voiceSearchBtn" title="음성으로 검색" aria-label="음성 검색">
+              <svg class="mic-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+                <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Search Buttons -->
+        <div class="search-buttons">
+          <button type="submit" class="btn-google-action" id="btnGoogleSearch">Google 검색</button>
+          <button type="button" class="btn-google-action" id="btnFeelingLucky">I'm Feeling Lucky</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Shortcuts / Bookmarks Section -->
+    <section class="shortcuts-section" aria-label="바로가기">
+      <div class="shortcuts-grid" id="shortcutsGrid">
+        <!-- Default Shortcuts will be rendered by JavaScript -->
+      </div>
+    </section>
+
+    <!-- Quote of the Day Section -->
+    <section class="quote-section" id="quoteSection" aria-label="오늘의 명언">
+      <div class="quote-card">
+        <div class="quote-header">
+          <div class="quote-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"/>
+            </svg>
+            <span>오늘의 명언</span>
+          </div>
+          <div class="quote-actions">
+            <button class="quote-tool-btn" id="copyQuoteBtn" title="명언 복사하기" aria-label="명언 복사">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+            </button>
+            <button class="quote-tool-btn" id="newQuoteBtn" title="새로운 명언 보기" aria-label="새 명언">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="quote-body">
+          <blockquote class="quote-text" id="quoteText">
+            "작은 기회로부터 종종 위대한 업적이 시작된다."
+          </blockquote>
+          <div class="quote-author-wrap">
+            <span class="quote-dash">—</span>
+            <span class="quote-author" id="quoteAuthor">데모스테네스</span>
+            <span class="quote-category" id="quoteCategory">성공 / 도전</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Add Shortcut Modal -->
+  <div class="modal-backdrop" id="shortcutModal" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3>바로가기 추가</h3>
+        <button class="btn-close-modal" id="closeModalBtn" aria-label="닫기">&times;</button>
+      </div>
+      <form id="addShortcutForm">
+        <div class="form-group">
+          <label for="shortcutName">이름</label>
+          <input type="text" id="shortcutName" required placeholder="예: GitHub" maxlength="20">
+        </div>
+        <div class="form-group">
+          <label for="shortcutUrl">URL</label>
+          <input type="url" id="shortcutUrl" required placeholder="https://github.com">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" id="cancelModalBtn">취소</button>
+          <button type="submit" class="btn-primary">완료</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-top">
+      <span class="location-text">대한민국</span>
+      <span class="bullet">•</span>
+      <span class="weather-brief" id="footerWeatherBrief">서울 맑음 / 제주 맑음</span>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-links-left">
+        <a href="https://about.google/" target="_blank" rel="noopener">Google 정보</a>
+        <a href="https://ads.google.com/" target="_blank" rel="noopener">광고</a>
+        <a href="https://www.google.com/services/" target="_blank" rel="noopener">비즈니스</a>
+        <a href="https://google.com/search/howsearchworks/" target="_blank" rel="noopener">검색의 원리</a>
+      </div>
+      <div class="footer-links-right">
+        <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">개인정보처리방침</a>
+        <a href="https://policies.google.com/terms" target="_blank" rel="noopener">약관</a>
+        <a href="#" id="customSettingsBtn">설정</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Script -->
+  <script src="script.js"></script>
+</body>
+</html>
